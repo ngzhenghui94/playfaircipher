@@ -12,7 +12,7 @@ class Playfair{
         char[] chars = keyword.toCharArray();
         Set<Character> charSet = new LinkedHashSet<>();
         for (char c : chars) {
-            if(c !='J'){
+            if(c !='I'){
                 charSet.add(c);
             }
         }
@@ -67,7 +67,7 @@ class Playfair{
         int i=0;
         int j=0;
         while(startChar <= 'Z'){
-            if(keyword.indexOf(startChar)<0 && startChar!= 'J'){
+            if(keyword.indexOf(startChar)<0 && startChar!= 'I'){
                 if(fpMatrix[i][j] == '1'){
                     fpMatrix[i][j] = startChar;
                     startChar++;
@@ -83,17 +83,44 @@ class Playfair{
         return fpMatrix;
     }
 
-    // Adjust the plainText by removing "J" for playfair cipher.
+    // Adjust the plainText by replacing I with J and removes all spaces.
+    // Text with consecutive same char, will have x inserted inbetween
     // If plainText len is odd, append 'Z' to it. (https://learncryptography.com/classical-encryption/playfair-cipher/)
+    // Therefore: If MSG = "zzzz" Adjusted MSG = "zxzxzxz" (ODD length) = "zxzxzxzz"
     private static String adjustPlainText(String plainText) {
-        String newPt = plainText.replaceAll("J", "");
-        StringBuilder sb = new StringBuilder();
-        if (newPt.length() % 2 == 0) {
-            return newPt;
-        }else if (newPt.length() % 2 == 1) {
-            newPt += 'Z';
+        String newPt = plainText.replaceAll("I", "J").replaceAll(" ", "");
+        int length = newPt.length();
+        StringBuilder sbPt = new StringBuilder(newPt);
+        for (int i = 0; i < length - 1; i+=2) {
+            if(sbPt.charAt(i) == sbPt.charAt(i+1)) {
+                sbPt.insert(i+1, "X");
+                length++;
+            }
         }
-        return newPt;
+        if (sbPt.length() % 2 == 0) {
+            return newPt;
+        }else if (sbPt.length() % 2 == 1) {
+            sbPt.append('Z');
+        }
+        return sbPt.toString();
+    }
+
+    private static String adjustCipherText(String cipherText) {
+        String newCt = cipherText.replaceAll("I", "J").replaceAll(" ", "");
+        int length = newCt.length();
+        StringBuilder sbCt = new StringBuilder(newCt);
+        for (int i = 0; i < length - 1; i+=2) {
+            if(sbCt.charAt(i) == sbCt.charAt(i+2)) {
+                sbCt.deleteCharAt(i+1);
+                length++;
+            }
+        }
+        if (sbCt.length() % 2 == 0) {
+            return newCt;
+        }else if (sbCt.length() % 2 == 1) {
+            sbCt.append('Z');
+        }
+        return sbCt.toString();
     }
 
     // Encoding (Encrypt: shift(dir) = 1. Decrypt shift(dir) = 4)
@@ -133,7 +160,6 @@ class Playfair{
     public static void main(String args[]) throws IOException {
         Playfair obj = new Playfair();
         if (args[0].equals("-e")){
-            System.out.println("Playfair Cipher, Rules: J is omitted(From Keyword & String)");
             String keyword = args[1].toUpperCase();
             String plainText = args[2].toUpperCase();
             System.out.println("Encrypt Mode.\n" + "Input'd Keyword: " + keyword);
@@ -153,7 +179,6 @@ class Playfair{
             // Output: kopwo
             String keyword = args[1].toUpperCase();
             String cipherText = args[2].toUpperCase();
-            System.out.println("Playfair Cipher, Rules: J is omitted(From Keyword & String)");
             System.out.println("Decrypt mode.\n" + "Input'd Keyword: " + keyword);
             keyword = obj.cleanKey(keyword);
             fpMatrix = obj.initMatrix();

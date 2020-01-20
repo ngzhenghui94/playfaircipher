@@ -1,6 +1,8 @@
 Playfair cipher
-J is omitted.
-if msg is odd len, 'Z' is appended to the message.
+// Adjust the plainText by replacing I with J and removes all spaces.
+// Text with consecutive same char, will have x inserted inbetween
+// If plainText len is odd, append 'Z' to it. (https://learncryptography.com/classical-encryption/playfair-cipher/)
+// Therefore: If MSG = "zzzz" Adjusted MSG = "zxzxzxz" (ODD length) = "zxzxzxzz"
 
 To compile:
 1.) navigate to the src folder within the project
@@ -8,29 +10,29 @@ To compile:
 
 To run:
 1.) java Playfair [-e/-d] [keyword] [message]
-e.g java Playfair -e mykey ALICE
+e.g java Playfair -e test zzzz
 <<Output>>
-Encrypt mode.
-Input'd Keyword: MYKEY
-MYKEA
-BCDFG
-HILNO
-PQRST
-UVWXZ
-Adjusted PlainText: ALICEZ
-Adjusted keyword: MYKE
-Encrypted Text: OKQIXA
+Encrypt Mode.
+Input'd Keyword: TEST
+TESAB
+CDFGH
+JKLMN
+OPQRU
+VWXYZ
+Adjusted PlainText: ZXZXZXZZ
+Adjusted keyword: TES
+Encrypted Text: VYVYVYVV
 <<Output End>>
 
 
 e.g java Playfair -d mykey OKQIXA
 <<Output>>
 Decrypt mode.
-Input'd Keyword: MYKEY
-MYKEA
-BCDFG
-HILNO
-PQRST
-UVWXZ
-Decrypted Text: ALICEZ
+Input'd Keyword: TEST
+TESAB
+CDFGH
+JKLMN
+OPQRU
+VWXYZ
+Decrypted Text: ZXZXZXZZ
 <<Output End>>
