@@ -1,0 +1,26 @@
+To compile:
+1.) navigate to the src folder within the project
+2.) compile: javac Playfair.java
+
+To run:
+1.) java Playfair [-e/-d] [keyword] [message]
+e.g java Playfair -e mykey ALICE
+//Output:
+  MYKEA
+  BCDFG
+  HILNO
+  PQRST
+  UVWXZ
+//cipherText: OKQIXA
+e.g java Playfair -d mykey OKQIXA
+//Output:
+    MYKEA
+    BCDFG
+    HILNO
+    PQRST
+    UVWXZ
+//  Decrypted Text: ALICEZ
+
+
+J is omitted.
+if msg is odd, 'Z' is appended to the message.
