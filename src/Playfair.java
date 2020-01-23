@@ -1,12 +1,46 @@
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 class Playfair{
     private static char[][] fpMatrix;
-    // To Trim Playfair cipher keyword e.g TEST > TES
-    // PASS > PAS
+    // Generate a random key of length 6.
+    private String genKey() {
+        String alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder sb = new StringBuilder(6);
+        for (int i = 0; i < 6; i++) {
+            int ranIndex = (int) (alphabets.length() * Math.random());
+            sb.append(alphabets.charAt(ranIndex));
+        }
+        return sb.toString();
+    }
+
+    // Read string in file.
+    private static String readFile(String fileName) throws IOException {
+        String data = "";
+        data = new String(Files.readAllBytes(Paths.get(fileName)));
+        return data.toUpperCase();
+    }
+    // Write string to file.
+    private static void writeFile(String filename, String string) throws IOException {
+        File file = new File(filename);
+        if (file.createNewFile()){
+            //System.out.println("File is created!");
+        } else {
+            //System.out.println("File already exists.");
+        }
+        FileWriter writer = new FileWriter(file);
+        writer.write(string);
+        writer.close();
+    }
+
+    // To clean the generated keyword
     // Uses LinkedHashSet to remove duplicated char.
+    // Removes I from key.
     private String cleanKey(String keyword) {
         char[] alphabet = "ABCDEFGHIJKLNMOPQRSTUVWXYZ".toCharArray();
         char[] chars = keyword.toCharArray();
@@ -23,7 +57,7 @@ class Playfair{
         return sb.toString();
     }
 
-    // Fil the 2d matrix ith 1s
+    // Fill the 2d matrix ith 1s
     private char[][] initMatrix() {
         fpMatrix = new char[5][5];
         for(int i=0; i<5; i++){
@@ -33,7 +67,7 @@ class Playfair{
         }
         return fpMatrix;
     }
-
+    // fn to print the 2d mx
     private static void printMatrix(char[][] fpMatrix){
         for(int i=0; i<5; i++){
             for(int j=0; j<5; j++){
@@ -43,8 +77,8 @@ class Playfair{
         }
     }
 
+    // Fill the 2d matrix with the keyword first.
     private char[][] keyFill(char[][] fpMatrix, String keyword){
-        // Fill the matrix with Keyword first.
         int counter = 0;
         int keywordLen = keyword.length();
         int getRows = keywordLen/5;
@@ -62,6 +96,7 @@ class Playfair{
         return fpMatrix;
     }
 
+    // Fill the remaining of the matrix with left over chars. Omitting I.
     private char[][] fillChar(char[][] fpMatrix, String keyword){
         char startChar = 'A';
         int i=0;
@@ -105,24 +140,6 @@ class Playfair{
         return sbPt.toString();
     }
 
-    private static String adjustCipherText(String cipherText) {
-        String newCt = cipherText.replaceAll("I", "J").replaceAll(" ", "");
-        int length = newCt.length();
-        StringBuilder sbCt = new StringBuilder(newCt);
-        for (int i = 0; i < length - 1; i+=2) {
-            if(sbCt.charAt(i) == sbCt.charAt(i+2)) {
-                sbCt.deleteCharAt(i+1);
-                length++;
-            }
-        }
-        if (sbCt.length() % 2 == 0) {
-            return newCt;
-        }else if (sbCt.length() % 2 == 1) {
-            sbCt.append('Z');
-        }
-        return sbCt.toString();
-    }
-
     // Encoding (Encrypt: shift(dir) = 1. Decrypt shift(dir) = 4)
     private String encode(String text, char[][] fpMatrix, int dir){
         StringBuilder encodedText = new StringBuilder();
@@ -157,38 +174,60 @@ class Playfair{
         return encodedText.toString();
     }
 
+
+
     public static void main(String args[]) throws IOException {
         Playfair obj = new Playfair();
         if (args[0].equals("-e")){
-            String keyword = args[1].toUpperCase();
-            String plainText = args[2].toUpperCase();
-            System.out.println("Encrypt Mode.\n" + "Input'd Keyword: " + keyword);
+            System.out.println("Plain text with odd length is padded with a Z at the end. \nJ is replaced with I.\nConsecutive same chars have X inserted inbetween them.");
+            String keyFileName = args[1];
+            String plainFileName = args[2];
+            String cipherFileName = args[3];
+            String cipherText;
+            // In Encrypt mode, generate a key of length 6.
+            String keyword = obj.genKey();
+            // Write key to Keyfile
+            obj.writeFile(keyFileName, keyword);
+            // Read Plaintext.txt
+            String plainText = obj.readFile(plainFileName);
+            System.out.println("Encrypt Mode.\n" + "Generated Keyword: " + keyword);
             keyword = obj.cleanKey(keyword);
             fpMatrix = obj.initMatrix();
             fpMatrix = obj.keyFill(fpMatrix, keyword);
             fpMatrix = obj.fillChar(fpMatrix, keyword);
             obj.printMatrix(fpMatrix);
             String adjustedPlainText = obj.adjustPlainText(plainText);
+            System.out.println("PlainText: " + plainText);
             System.out.println("Adjusted PlainText: " + adjustedPlainText);
             System.out.println("Adjusted keyword: " + keyword);
-            System.out.println("Encrypted Text: "+ obj.encode(adjustedPlainText, fpMatrix, 1));
-            //java Playfair -e test kopwo
-            // Output: PIWEVU
+            // Write ciphertext.txt
+            cipherText = obj.encode(adjustedPlainText, fpMatrix, 1);
+            obj.writeFile(cipherFileName, cipherText);
+            System.out.println("Encrypted Text: " + cipherText);
+
         }else if(args[0].equals("-d")){
-            //java Playfair -d test PIWEVU
-            // Output: kopwo
-            String keyword = args[1].toUpperCase();
-            String cipherText = args[2].toUpperCase();
-            System.out.println("Decrypt mode.\n" + "Input'd Keyword: " + keyword);
+            System.out.println("Plain text with odd length is padded with a Z at the end. \nJ is replaced with I.\nConsecutive same chars have X inserted inbetween them.");
+            String keyFileName = args[1];
+
+            String cipherFileName = args[2];
+            String plainFileName = args[3];
+            String cipherText, plainText;
+            String keyword = obj.readFile(keyFileName);
+            System.out.println("Decrypt mode.\n" + "Read'd Keyword: " + keyword);
             keyword = obj.cleanKey(keyword);
             fpMatrix = obj.initMatrix();
             fpMatrix = obj.keyFill(fpMatrix, keyword);
             fpMatrix = obj.fillChar(fpMatrix, keyword);
             obj.printMatrix(fpMatrix);
-            System.out.println("Decrypted Text: "+ obj.encode(cipherText, fpMatrix, 4));
+            cipherText = obj.readFile(cipherFileName);
+            plainText = obj.encode(cipherText, fpMatrix, 4);
+            System.out.println("Encrypted Text: "+ cipherText);
+            System.out.println("Decrypted Text: "+ plainText);
+            obj.writeFile(plainFileName, plainText);
         }else{
             System.out.println("Missing args");
         }
     }
+
 
 }

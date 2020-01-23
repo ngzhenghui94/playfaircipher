@@ -9,30 +9,35 @@ To compile:
 2.) compile: javac Playfair.java
 
 To run:
-1.) java Playfair [-e/-d] [keyword] [message]
-e.g java Playfair -e test zzzz
-<<Output>>
+D:\Google Drive\eclipse-workspace\Playfair\src>javac *.java
+D:\Google Drive\eclipse-workspace\Playfair\src>java Playfair -e keyword.txt  plaintext.txt ciphertext.txt
+Plain text with odd length is padded with a Z at the end.
+J is replaced with I.
+Consecutive same chars have X inserted inbetween them.
 Encrypt Mode.
-Input'd Keyword: TEST
-TESAB
-CDFGH
-JKLMN
-OPQRU
-VWXYZ
-Adjusted PlainText: ZXZXZXZZ
-Adjusted keyword: TES
-Encrypted Text: VYVYVYVV
-<<Output End>>
+Generated Keyword: CJXGCL
+CJXGL
+ABDEF
+HKMNO
+PQRST
+UVWYZ
+PlainText: CCCCCCCCC
+Adjusted PlainText: CXCXCXCXCXCXCXCXCZ
+Adjusted keyword: CJXGL
+Encrypted Text: JGJGJGJGJGJGJGJGUL
 
-
-e.g java Playfair -d mykey OKQIXA
-<<Output>>
+D:\Google Drive\eclipse-workspace\Playfair\src>java Playfair -d keyword.txt ciphertext.txt plaintext.txt
+Plain text with odd length is padded with a Z at the end.
+J is replaced with I.
+Consecutive same chars have X inserted inbetween them.
 Decrypt mode.
-Input'd Keyword: TEST
-TESAB
-CDFGH
-JKLMN
-OPQRU
-VWXYZ
-Decrypted Text: ZXZXZXZZ
-<<Output End>>
+Read'd Keyword: CJXGCL
+CJXGL
+ABDEF
+HKMNO
+PQRST
+UVWYZ
+Encrypted Text: JGJGJGJGJGJGJGJGUL
+Decrypted Text: CXCXCXCXCXCXCXCXCZ
+
+D:\Google Drive\eclipse-workspace\Playfair\src>
