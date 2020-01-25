@@ -25,6 +25,7 @@ class Playfair{
         data = new String(Files.readAllBytes(Paths.get(fileName)));
         return data.toUpperCase();
     }
+
     // Write string to file.
     private static void writeFile(String filename, String string) throws IOException {
         File file = new File(filename);
@@ -208,7 +209,6 @@ class Playfair{
         }else if(args[0].equals("-d")){
             System.out.println("Plain text with odd length is padded with a Z at the end. \nJ is replaced with I.\nConsecutive same chars have X inserted inbetween them.");
             String keyFileName = args[1];
-
             String cipherFileName = args[2];
             String plainFileName = args[3];
             String cipherText, plainText;
